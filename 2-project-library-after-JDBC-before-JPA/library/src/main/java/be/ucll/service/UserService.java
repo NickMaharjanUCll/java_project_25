@@ -110,25 +110,27 @@ public class UserService {
 
 
     public User  getMembershipByEmailAndDate(String email, Membership membership){
-        if (userRepository.existsByEmail(email)){
+        if (!userRepository.existsByEmail(email)){
             throw new ServiceException("User does not exist.");
         }
         User user = userRepository.findByEmail(email);
         
         membership.setUser(user);
+        // user.addMembership(membership);
+        // user.setProfile(user.getProfile());    
+        // User user2 = new User(user.getName(), user.getAge(), user.getEmail(), user.getPassword());
+        
+        // for(Membership members : user.getMemberships()){
+        //     user2.addMembership(members);
+
+        // }
+
         user.addMembership(membership);
-
-        User user2 = new User(user.getName(), user.getAge(), user.getEmail(), user.getPassword());
-        user2.setProfile(user.getProfile());
-        for(Membership members : user.getMemberships()){
-            user2.addMembership(members);
-
-        }
-
+        
         userRepository.save(user);
          memberShipRepository.save(membership);
 
-         return user2;
+         return user;
     }
     // public String deleteUser(String email){
     //     if(!userRepository.existsByEmail(email)){

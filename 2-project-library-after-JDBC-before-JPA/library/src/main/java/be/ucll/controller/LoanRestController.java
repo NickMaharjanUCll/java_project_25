@@ -6,6 +6,7 @@ import java.util.Map;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,10 +43,10 @@ public class LoanRestController {
         return loanService.deleteLoans(email);
     }
 
-    //  @PostMapping("/{email}/loans/{startDate}")
-    // public Loan updatedLoanByEmailandStartDate(@PathVariable(value = "email") String email, @PathVariable(value = "startDate") LocalDate startDate,@RequestBody List<Long> publicationIDs){
-    //     return loanService.registerLoan(email,startDate,publicationIDs);
-    // }
+     @PostMapping("/{email}/loans/{startDate}")
+    public Loan updatedLoanByEmailandStartDate(@PathVariable(value = "email") String email, @PathVariable(value = "startDate") LocalDate startDate,@RequestBody List<Long> publicationIDs){
+        return loanService.updatedLoanByEmailandStartDate(email,startDate,publicationIDs);
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({DomainException.class})

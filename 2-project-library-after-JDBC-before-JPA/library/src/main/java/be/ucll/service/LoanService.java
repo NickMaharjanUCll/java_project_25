@@ -2,8 +2,10 @@ package be.ucll.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.el.stream.Optional;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,47 +72,30 @@ public class LoanService {
     public Loan updatedLoanByEmailandStartDate(String email, LocalDate startDate, List<Long> publicationIds){
         if(!userRepository.existsByEmail(email)){
             throw new ServiceException("User not found.");
-        }
-         if(loanRepository.findByUserEmail(email).isEmpty()){ // we can also do by the size loanRepository.findByUserEmail(email).size() == 0
-            throw new ServiceException("User has no loan.");
+        }else if (!getLoansByUser(email, true).isEmpty()) {
+            throw new ServiceException( "User already has an active loan.");
+        } else if (ChronoUnit.DAYS.between(LocalDate.now(), startDate) > 30) {  // "startDate musn't be in future" is checked in the domain.
+            throw new ServiceException("Start date cannot be more than 30 days before today."); // So that only truly active loan can be registered.
         }
         
-        if(loanRepository.findByUserEmailAndEndDateIsNull(email).isEmpty()){ // same as above can use the size
-            throw new ServiceException("User has an active loan.");
+        // if(loanRepository.findByUserEmailAndEndDateIsNull(email).isEmpty()){ // same as above can use the size
+        //     throw new ServiceException("User has an active loan.");
+        // }
+        
+        List<Publication> publications = new ArrayList<>();
+        for (Long publicationId : publicationIds) {
+            Optional<Publication> publication = publicationRepository.findById(publicationId);
+            if (!publication.isPresent()) {
+                throw new ServiceException("Publication with id " + publicationId + " not found.");
+            }
+
+            publications.add(publication.get());
         }
 
-        // for (Long publicationId : publications){
-        //     if(!loanRepository.existsByPublicationId(publicationId)){
-        //         throw new ServiceException("Publication with Id" + publicationId + "not found");
-        //     }
-        }
+        User user = userRepository.findByEmail(email);
+        Loan loan = new Loan(user, publications, startDate);
+        loanRepository.save(loan);
 
-        // List<Publication> publications2 = publicationIDs.stream().map(x -> {
-        //     return publicationRepository.findById(x).orElse(() -> new ServiceException(String.format("publication with Id %d not found.", x)));
-        // }).toList();
-        
-        // User user = userRepository.findByEmail(email);
-        
-        // Loan loan = new Loan(user,publications2,startDate ,startDate.plusDays(30));
-        // loanRepository.save(loan);
-
-
-        // return loan;
-
-    //     List<Publication> publications = new ArrayList<>();
-    //     for (Long publicationId : publicationIds) {
-    //         Optional<Publication> publication = publicationRepository.findById(publicationId);
-    //         if (!publication.isPresent()) {
-    //             throw new ServiceException("Publication with id " + publicationId + " not found.");
-    //         }
-
-    //         publications.add(publication.get());
-    //     }
-
-    //     User user = userRepository.findByEmail(email);
-    //     Loan loan = new Loan(user, publications, startDate);
-    //     loanRepository.save(loan);
-
-    //     return loan;
-    // }
+        return loan;
+    }
 }

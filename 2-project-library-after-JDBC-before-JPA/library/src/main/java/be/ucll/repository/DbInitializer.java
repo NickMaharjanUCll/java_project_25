@@ -94,20 +94,32 @@ public class DbInitializer {
         LocalDate fixedToday = LocalDate.of(2010, 3, 13);
 
 
-        loanRepository.save(new Loan(users.get(0),List.of(publications.get(0)),fixedToday.minusDays(30),fixedToday));
-        loanRepository.save(new Loan(users.get(2),List.of(publications.get(2)),fixedToday.minusDays(50),null));
-        loanRepository.save(new Loan(users.get(1),List.of(publications.get(1)),fixedToday.minusDays(46),fixedToday));
-        loanRepository.save(new Loan(users.get(2),List.of(publications.get(2)),fixedToday.minusDays(40),fixedToday));
-        loanRepository.save(new Loan(users.get(3),List.of(publications.get(3)),fixedToday.minusDays(2),null));
-        loanRepository.save(new Loan(users.get(3),List.of(publications.get(3)),fixedToday.minusDays(2),null));
-        loanRepository.save(new Loan(users.get(4),List.of(publications.get(3), publications.get(2), publications.get(0)),fixedToday.minusDays(2),null));
-        // Q& localhost/.../h2    SELECT * FROM LOAN >>>>> publications column is null. Is that okay?
+        Loan loanJohn = new Loan(users.get(0),List.of(publications.get(0)),fixedToday.minusDays(30));
+        Loan loanJane = new Loan(users.get(1),List.of(publications.get(1)),fixedToday.minusDays(46));
+        Loan loanJack = new Loan(users.get(2),List.of(publications.get(2)),fixedToday.minusDays(50));
+        Loan loanJack2 = new Loan(users.get(2),List.of(publications.get(2)),fixedToday.minusDays(40));
+        Loan loanSarah = new Loan(users.get(3),List.of(publications.get(3)),fixedToday.minusDays(2));
+        Loan loanSarah2 = new Loan(users.get(3),List.of(publications.get(3)),fixedToday.minusDays(2));
+        Loan loanBirgit = new Loan(users.get(4),List.of(publications.get(3), publications.get(2), publications.get(0)), today.minusDays(2)); // Intentionally used today instead of fixedToday so that it is always an active loan.
+        Loan loanBirgit2 = new Loan(users.get(4),List.of(publications.get(2), publications.get(1), publications.get(0)), fixedToday.minusDays(20)); // Intentionally used today instead of fixedToday so that it is always an active loan.
+        
+        loanJohn.returnLoan(fixedToday.minusDays(20));
+        loanJane.returnLoan(fixedToday.minusDays(30));
+        loanJack.returnLoan(fixedToday.minusDays(40));
+        loanJack2.returnLoan(fixedToday.minusDays(30));
+        loanSarah.returnLoan(fixedToday);
+        loanSarah2.returnLoan(fixedToday);
+        // loanBirgit is never returned, because it's active
+        loanBirgit2.returnLoan(fixedToday);
 
+        loanRepository.save(loanJohn);
+        loanRepository.save(loanJane);
+        loanRepository.save(loanJack);
+        loanRepository.save(loanJack2);
+        loanRepository.save(loanSarah);
+        loanRepository.save(loanSarah2);
+        loanRepository.save(loanBirgit);
+        loanRepository.save(loanBirgit2);
     }
-
-
-
-
-
-    }
+}
 

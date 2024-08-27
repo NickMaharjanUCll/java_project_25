@@ -36,14 +36,13 @@ CREATE TABLE publications(
 );
 
 
-
-
 CREATE TABLE membership(
     ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     start_date DATE,  -- Changed to match @Column annotation
     end_date DATE,    -- Changed to match @Column annotation
     type VARCHAR(255),
     user_id BIGINT,
+    free_loan int,
     FOREIGN KEY(user_id) REFERENCES users
 );
 
@@ -52,6 +51,8 @@ create table loan(
     user_id BIGINT,
     start_date Date,
     end_date Date,
+    price int,
+    return_date DATE,
     foreign key (user_id) references users
 );
 

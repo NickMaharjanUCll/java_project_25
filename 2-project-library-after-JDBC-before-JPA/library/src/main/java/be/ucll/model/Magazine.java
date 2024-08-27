@@ -4,6 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 
 @Entity
@@ -18,6 +19,9 @@ public class Magazine extends Publication{
 
     @NotBlank(message = "ISSN is required.")
     private String ISSN;
+
+
+
 
     public Magazine(String title, String editor, String ISSN, int publicationYear, int availableCopies) {
         super(title, publicationYear, availableCopies);

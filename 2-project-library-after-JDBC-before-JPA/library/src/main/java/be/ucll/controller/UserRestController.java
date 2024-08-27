@@ -82,7 +82,7 @@ public class UserRestController {
         return userService.getUserWithInterestByAge(interest, age);
     }
     
-    @PostMapping("/{email}/interest")
+    @PostMapping("/{email}/membership")
     public User getMembershipByEmailAndDate(@PathVariable(value = "email") String email, @RequestBody Membership membership){
         return userService.getMembershipByEmailAndDate(email,membership);
     }

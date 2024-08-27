@@ -2,7 +2,6 @@ package be.ucll.model;
 
 import java.time.Year;
 
-import org.hibernate.mapping.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;

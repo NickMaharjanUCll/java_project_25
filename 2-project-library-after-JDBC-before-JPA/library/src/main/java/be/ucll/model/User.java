@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,21 +18,34 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
 public class User {
-    private String name;
-
     
-    private int age;
+   
     private String email;
-    private String password;
+   
+
+@NotBlank(message = "Name is required.") // First class (on fields)
+private String name;
+
+@Min(value = 1, message = "Age must be a positive integer between 0 and 101.")
+@Max(value = 101, message = "Age must be a positive integer between 0 and 101.")
+private int age;
+
+@Size(min = 8, message = "Password must be at least 8 characters long.")
+private String password;
 
     protected User(){}
 
     @OneToOne
     @JoinColumn(name = "profile_id")
+    // @JsonBackReference
     private Profile profile;
 
   
@@ -41,23 +55,34 @@ public class User {
 
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
+    // he has done unidirection for the membership for some reason while for me it is bidirectional
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    @JsonManagedReference
+    // @JsonIgnore
     private List<Membership> memberships = new ArrayList<>();
 
 
+    public List<Membership> getMemberships() {
+        return memberships;
+    }
+
+    public void setMemberships(List<Membership> memberships) {
+        this.memberships = memberships;
+    }
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy="user")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Loan> loans = new ArrayList<>();
     
+   
+
     public List<Loan> getLoans() {
         return loans;
     }
 
     public void setLoans(List<Loan> loans) {
-        loans.add((Loan) loans);
+        this.loans = loans;
     }
 
     public User(String name, int age, String email, String password) {
@@ -153,13 +178,11 @@ public class User {
                 throw new DomainException("User has already a membership on that date.");
             }
         }
-        
+        memberships.add(membership);
     }
-    public List<Membership> getMemberships(){
-        return memberships;
-    }
+    
 
-    public Membership getActivMembership(LocalDate date){
+    public Membership getActiveMembership(LocalDate date){
         for (Membership membership : memberships){
 
             if((membership.getStartDate().isBefore(date)) ||  membership.getStartDate().isEqual(date) && membership.getEndDate().isAfter(date)){
